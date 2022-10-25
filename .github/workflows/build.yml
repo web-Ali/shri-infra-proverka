@@ -14,5 +14,7 @@ jobs:
           node-version: 16.16.0
       - name: Install dependencies
         run: npm install
-      - name: Generate build
-        run: npm run build
+      - name: Compile with TypeScript
+        run: npm run ts
+      - name: Call LINT
+        run: npm run lint
