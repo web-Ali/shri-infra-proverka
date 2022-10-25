@@ -4,10 +4,6 @@ on:
   push:
     tags:
       - 'rc-*'
-  workflow_run:
-    workflows: [Build]
-    types:
-      - completed
 
 jobs:
   build-release:
@@ -21,5 +17,9 @@ jobs:
           node-version: 16.16.0
       - name: Install dependencies
         run: npm install
+      - name: Compile with TypeScript
+        run: npm run ts
+      - name: Call LINT
+        run: npm run lint
       - name: Build release ticket
         run: npm run ticket
