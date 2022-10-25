@@ -3,7 +3,7 @@ name: Build release
 on:
   push:
     tags:
-      - 'rc-*'
+      - 'rc-0.0.*'
 
 jobs:
   build-release:
