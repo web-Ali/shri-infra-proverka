@@ -22,7 +22,8 @@
     "lint": "./node_modules/.bin/eslint .",
     "ts": "./node_modules/.bin/tsc",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "ticket": "echo '>>>>> BUILD RELEASE TICKET'"
   },
   "eslintConfig": {
     "extends": [
