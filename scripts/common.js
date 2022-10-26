@@ -36,7 +36,7 @@ const getTags = async () =>
 
             
             const tagsRange = (tags) => 
-            tags.length == 1 ? tags[0] : `${tags[0]}...${tags[1]}`
+            tags.length === 1 ? tags[0] : `${tags[0]}...${tags[1]}`
             
             const getCommitMessagesBetweenTags = async (tags) => 
             (await callCommand(`git log --pretty=short ${tagsRange(tags)}`))
