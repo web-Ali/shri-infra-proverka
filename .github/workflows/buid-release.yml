@@ -1,5 +1,10 @@
 name: Build release
 
+env:
+  ISSUE: HOMEWORKSHRI-192
+  ORG_ID: ${{ secrets.ORG_ID }}
+  TOKEN: ${{ secrets.TOKEN }}
+
 on:
   push:
     tags:
@@ -28,12 +33,14 @@ jobs:
       - name: Call LINT
         run: npm run lint
 
+      - name: Build production
+        run: npm run build
+
       - name: Build release ticket
-        env:
-          ORG_ID: ${{ secrets.ORG_ID }}
-          TOKEN: ${{ secrets.TOKEN }}
-          ISSUE: HOMEWORKSHRI-192
-        run: npm run ticket
+        run: node ./scripts/ticket
 
       - name: Create Docker container
-        run: npm run docker
+        run: docker build -t $(node ./scripts/docker_name) .
+
+      - name: Add docker comment
+        run: node ./scripts/comment
