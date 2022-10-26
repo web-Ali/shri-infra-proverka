@@ -1,5 +1,5 @@
 var http = require('http')
-const { spawn } = require('node:child_process');
+const { spawn } = require('node:child_process')
 
 const api = (path, method = 'GET', json) => new Promise(resolve => 
 {
@@ -18,64 +18,56 @@ const api = (path, method = 'GET', json) => new Promise(resolve =>
     request.end(json && JSON.stringify(json))
 })
 
-// api('/v2/myself')
-//     .then(json => console.log(json))
+const callCommand = (command) => new Promise(resolve => {
+    let parts = command.split(' ')
+    const subprocess = spawn(parts[0], parts.slice(1));
+    let str = ''
+    subprocess.stdout.on('data', data => str += data);
+    subprocess.stdout.on('end', () => resolve(str))
+})
 
-// api('/v2/issues/HOMEWORKSHRI-192')
-//     .then(json => console.log(json))
+const getLastCommitAuthor = async () => 
+        (await callCommand('git log HEAD^...HEAD'))
+            .split('\n')[1].split('Author: ').join('')
 
+const getTags = async () => 
+        (await callCommand('git tag -l rc-*'))
+            .trim().split('\n')
 
-// const { exec } = require("child_process");
-// exec('git --version', (error, stdout, stderr) => 
-// {
-//     console.log(stdout)
-// })
+const tagsRange = (tags) => 
+    tags.length == 1 ? tags[0] : `${tags[0]}...${tags[1]}`
 
-const callCommand = (command) => new Promise(resolve => 
+const getCommitMessagesBetweenTags = async (tags) => 
+    (await callCommand(`git log --pretty=short ${tagsRange(tags)}`))
+        .split('commit ').filter(x => x).map(x => ({
+                commit: x.split('\n')[0],
+                author: x.split('\n')[1].split('Author: ').join(''),
+                message: x.split('\n').slice(3).map(x => x.trim()).filter(x => x).join('\n')
+            })
+        )
+
+async function main()
+{
+    const VersionPrefix = 'rc-'
+
+    let date = new Date()
+    let tags = await getTags()
+    let lastTag = tags.slice(-1)[0]
+    let version = lastTag.split(VersionPrefix).join('')
+
+    let ticket = 
     {
-        let parts = command.split(' ')
-        const subprocess = spawn(parts[0], parts.slice(1));
-        let str = ''
-        subprocess.stdout.on('data', data => str += data);
-        subprocess.stdout.on('end', () => resolve(str))
-    })
+        summary: `Релиз №${version} от ${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`,
+        description:
+`Ответственный за релиз: ${await getLastCommitAuthor()}
+---
+Коммиты, попавшие в релиз:
+${(await getCommitMessagesBetweenTags(tags.slice(-2))).map(x => `\`${x.commit.substring(0, 8)}\` ${x.author} ${x.message}`).join('\n\n')}`
+    }
 
-const getLastCommitAuthor = () => 
-    new Promise(resolve => 
-        callCommand('git log --name-status HEAD^..HEAD').then(data => 
-            resolve(data.split('\n').find(x => x.includes('Author: ')).split('Author: ').join(''))))
+    let res = await api('/v2/issues/HOMEWORKSHRI-192', 'PATCH', ticket)
 
-getLastCommitAuthor().then(name => console.log(name))
+    console.log(res)
+}
 
-const getTags = () => 
-    new Promise(resolve => 
-        callCommand('git tag -l rc-*').then(data => 
-            resolve(data.trim().split('\n'))))
-
-getTags().then(tags => console.log(tags))
-
-const getCommitMessagesBetweenTags = (tag1, tag2) => 
-    new Promise(resolve => 
-        callCommand(`git log --pretty=short ${tag1}...${tag2}`).then(data => 
-            resolve(data.split('commit ').filter(x => x).map(x => (
-                {
-                    commit: x.split('\n')[0],
-                    author: x.split('\n')[1].split('Author: ').join(''),
-                    message: x.split('\n').slice(3).map(x => x.trim()).filter(x => x).join('\n')
-                })
-    ))))
-
-getCommitMessagesBetweenTags('rc-0.0.1', 'rc-0.0.4').then(data => console.log(data))
-
-// let date = new Date();
-
-// api('/v2/issues/HOMEWORKSHRI-192', 'PATCH', 
-// {
-//     'summary': `Релиз №${process.env.VERSION} от ${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`,
-//     'description' : `Ответственный за релиз: Vadim Grigoruk
-//     Коммиты, попавшие в релиз:
-//     Vadim Grigoruk-review fixes
-//     Vadim Grigoruk-add docs
-//     Vadim Grigoruk-add tests
-//     Vadim Grigoruk-fix`
-// }).then(json => console.log(json))
+main()
