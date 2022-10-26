@@ -28,9 +28,6 @@ jobs:
       - name: Call LINT
         run: npm run lint
 
-      - name: Test GIT command
-        run: git log HEAD^...HEAD
-
       - name: Build release ticket
         env:
           ORG_ID: ${{ secrets.ORG_ID }}
