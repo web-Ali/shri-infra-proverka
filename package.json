@@ -23,7 +23,8 @@
     "ts": "./node_modules/.bin/tsc",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "ticket": "node ./scripts/test"
+    "ticket": "node ./scripts/ticket",
+    "docker": "echo Creating Docker"
   },
   "eslintConfig": {
     "extends": [

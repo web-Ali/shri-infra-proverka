@@ -32,4 +32,8 @@ jobs:
         env:
           ORG_ID: ${{ secrets.ORG_ID }}
           TOKEN: ${{ secrets.TOKEN }}
+          ISSUE: HOMEWORKSHRI-192
         run: npm run ticket
+
+      - name: Create Docker container
+        run: npm run docker
