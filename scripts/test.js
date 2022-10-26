@@ -52,6 +52,10 @@ async function main()
 
     let date = new Date()
     let tags = await getTags()
+
+    console.log(`INFO: Получили список релизных тегов:`)
+    console.log(tags)
+    
     let lastTag = tags.slice(-1)[0]
     let version = lastTag.split(VersionPrefix).join('')
 
@@ -65,8 +69,12 @@ async function main()
 ${(await getCommitMessagesBetweenTags(tags.slice(-2))).map(x => `\`${x.commit.substring(0, 8)}\` ${x.author} ${x.message}`).join('\n\n')}`
     }
 
+    console.log(`INFO: Сформировали объект тикета для отправки в трекер:`)
+    console.log(ticket)
+
     let res = await api('/v2/issues/HOMEWORKSHRI-192', 'PATCH', ticket)
 
+    console.log('INFO: Получили ответ от трекера:')
     console.log(res)
 }
 
