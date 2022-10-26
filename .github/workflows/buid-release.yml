@@ -1,7 +1,7 @@
 name: Build release
 
 env:
-  ISSUE: HOMEWORKSHRI-192
+  ISSUE: HOMEWORKSHRI-129
   ORG_ID: ${{ secrets.ORG_ID }}
   TOKEN: ${{ secrets.TOKEN }}
 

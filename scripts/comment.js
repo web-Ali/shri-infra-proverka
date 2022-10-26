@@ -3,10 +3,6 @@ const {api, getTags} = require('./common')
 async function main()
 {
     let tags = await getTags()
-
-    console.log(`INFO: Получили список релизных тегов:`)
-    console.log(tags)
-    
     let lastTag = tags.slice(-1)[0]
     let version = lastTag.split('rc-').join('')
 

@@ -28,16 +28,6 @@ ${(await getCommitMessagesBetweenTags(tags.slice(-2))).map(x => `\`${x.commit.su
 
     console.log('INFO: Получили ответ от трекера:')
     console.log(editResult)
-
-    let comment = 
-    {
-        text:`Собрали образ с тегом rc:${version}`
-    }
-
-    let commentResult = await api(`/v2/issues/${process.env.ISSUE}/comments`, 'POST', comment)
-
-    console.log('INFO: Трекер создал комментарий:')
-    console.log(commentResult)
 }
 
 main()
